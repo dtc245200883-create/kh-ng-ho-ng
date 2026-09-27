@@ -1,0 +1,7 @@
+# Báo cáo Chẩn đoán Dữ liệu (Gap Analysis) - Hệ thống HealthSync
+
+Bản thiết kế cơ sở dữ liệu cũ (Legacy Schema) tồn tại 3 điểm "vênh" nghiêm trọng so với quy trình nghiệp vụ (Activity Diagram) do BA cung cấp:
+
+1. **Sai lầm về quản lý vòng đời (Lifecycle State):** Cột `is_active BOOLEAN` chỉ biểu diễn được 2 trạng thái (Đúng/Sai). Trong khi đó, quy trình nghiệp vụ yêu cầu theo dõi 5 trạng thái chuyển tiếp: `PENDING` -> `CONFIRMED` -> `CHECKED_IN` -> `COMPLETED` / `CANCELLED`. Việc dùng Boolean làm mất khả năng theo dõi tiến trình khám bệnh.
+2. **Thất thoát dữ liệu tài chính & lý do hủy:** Cấu trúc cũ thiếu hoàn toàn các trường `deposit_amount` (Tiền cọc), `penalty_fee` (Phí phạt) và `cancel_reason` (Lý do hủy). Khi bệnh nhân hủy lịch sau khi `CONFIRMED`, hệ thống không có nơi ghi nhận khoản tiền phạt để kế toán đối soát doanh thu.
+3. **Thiếu sót thực thể Đơn thuốc (Prescription):** Theo quy trình, khi hoàn tất khám (`COMPLETED`), Bác sĩ phải kê đơn thuốc. Schema cũ không có bảng `Prescriptions` và liên kết khóa ngoại với `Appointments`, khiến dữ liệu khám bệnh bị đứt gãy.
